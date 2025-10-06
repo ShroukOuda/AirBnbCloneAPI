@@ -1,0 +1,6 @@
+@AirBnbCloneAPI_HostAddress = http://localhost:5143
+
+GET {{AirBnbCloneAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
