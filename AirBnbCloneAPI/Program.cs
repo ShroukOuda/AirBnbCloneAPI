@@ -1,6 +1,8 @@
 using AirBnbCloneAPI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AirBnbCloneAPI.Services;
+using AirBnbCloneAPI.Repositories;
 
 namespace AirBnbCloneAPI;
 
@@ -20,6 +22,9 @@ public class Program
             .AddEntityFrameworkStores<AppDbContext>();
 
         builder.Services.AddControllers();
+        
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
         
         // Add Swagger services
         builder.Services.AddEndpointsApiExplorer();
