@@ -1,3 +1,4 @@
+using AirBnbCloneAPI.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +9,10 @@ namespace AirBnbCloneAPI.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<User> _userManager;
-    private readonly IMapper _mapper;
-    public AuthController(UserManager<User> userManager, IMapper mapper)
+   private readonly IAuthService _authService;
+    public AuthController(IAuthService authService)
     {
-        _userManager = userManager;
-        _mapper = mapper;
+        _authService = authService;
     }
     
     [HttpPost("register")]
@@ -24,22 +23,13 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        User user = new User();
-        _mapper.Map(model, user);
-        // user.UserName = model.UserName;
-        // user.Email = model.Email;
-        // user.DateOfBirth = model.BirthDate;
-        // user.FirstName = model.FirstName;
-        // user.LastName = model.LastName;
-        // user.CreatedAt = DateTime.UtcNow;
-            
-        IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+        var (success, message) = await _authService.RegisterAsync(model);
 
-        if (!result.Succeeded)
+        if (!success)
         {
-            return BadRequest(result.Errors);
+            return BadRequest(message);
         }
-
-        return Ok("User Registered Successfully");
+        
+        return Ok(message);
     }
 }
