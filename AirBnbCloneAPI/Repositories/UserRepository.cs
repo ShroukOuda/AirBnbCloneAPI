@@ -12,6 +12,12 @@ public class UserRepository : IUserRepository
     {
         _userManager =  userManager;
     }
+
+    public async Task<User> GetByUserNameAsync(string userName)
+    {
+        return await _userManager.FindByNameAsync(userName);
+    }
+
     public async Task<User> GetByEmailAsync(string email)
     {
         return await _userManager.FindByEmailAsync(email);
@@ -25,5 +31,10 @@ public class UserRepository : IUserRepository
     public async Task<IdentityResult> CreateUserAsync(User user, string password)
     {
         return await _userManager.CreateAsync(user,  password);
+    }
+
+    public async Task<bool> CheckPasswordAsync(User user, string password)
+    {
+        return await _userManager.CheckPasswordAsync(user, password);
     }
 }
