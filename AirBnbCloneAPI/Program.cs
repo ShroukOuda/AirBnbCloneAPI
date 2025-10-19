@@ -1,8 +1,12 @@
+using System.Text;
 using AirBnbCloneAPI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AirBnbCloneAPI.Services;
 using AirBnbCloneAPI.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AirBnbCloneAPI;
 
@@ -31,6 +35,28 @@ public class Program
         builder.Services.AddAutoMapper(typeof(Program));
         builder.Services.AddSwaggerGen();
         
+        var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+        builder.Services.AddSingleton(jwtOptions);
+        builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwtOptions.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
+                };
+            });
+        
         var app = builder.Build();
 
         // Enable Swagger Middleware
@@ -44,6 +70,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
 

@@ -32,4 +32,17 @@ public class AuthController : ControllerBase
         
         return Ok(message);
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        var (success, message) = await _authService.LoginAsync(model);
+
+        if (!success)
+            return BadRequest(message);
+        return Ok(message);
+    }
 }
